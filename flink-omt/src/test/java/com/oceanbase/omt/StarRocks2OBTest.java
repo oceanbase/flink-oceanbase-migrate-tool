@@ -157,20 +157,20 @@ public class StarRocks2OBTest extends OceanBaseMySQLTestBase {
         env.execute(migrationConfig.getPipeline().getName());
 
         // table1
-        List<String> expected1 = Collections.singletonList("1,2024-12-05T10:28:07,xx,2.3,1,true");
+        List<String> expected1 = Collections.singletonList("1,2024-12-05 10:28:07,xx,2.3,1,1");
         assertContent(dataSource.getConnection(), expected1, "test1.orders1");
 
         List<String> expected2 =
-                Collections.singletonList("111,2024-12-05T10:02:31,orders2,2.3,1,1");
+                Collections.singletonList("111,2024-12-05 10:02:31,orders2,2.3,1,1");
         assertContent(dataSource.getConnection(), expected2, "test1.orders2");
 
         List<String> expected3 =
                 Arrays.asList(
-                        "1,1,A123456789,2023-01-01,2023-01-01T10:10:10,1234.5678,1.23456789,1.2345,123,12,example string 1,1,example varchar 1,{\"key1\": \"value1\"}",
-                        "2,0,B987654321,2023-02-01,2023-02-02T11:11:11,9876.5432,9.87654321,9.8765,456,34,example string 2,2,example varchar 2,{\"key2\": \"value2\"}",
-                        "5,1,E019283746,2023-05-01,2023-05-05T14:14:14,8765.4321,8.7654321,8.7654,202,90,example string 5,5,example varchar 5,{\"key5\": \"value5\"}",
-                        "4,0,D564738291,2023-04-01,2023-04-04T13:13:13,4321.8765,4.32187654,4.3211,101,78,example string 4,4,example varchar 4,{\"key4\": \"value4\"}",
-                        "3,1,C102938475,2023-03-01,2023-03-03T12:12:12,5678.1234,5.67812345,5.6789,789,56,example string 3,3,example varchar 3,{\"key3\": \"value3\"}");
+                        "1,1,A123456789,2023-01-01,2023-01-01 10:10:10,1234.5678,1.23456789,1.2345,123,12,example string 1,1,example varchar 1,{\"key1\": \"value1\"}",
+                        "2,0,B987654321,2023-02-01,2023-02-02 11:11:11,9876.5432,9.87654321,9.8765,456,34,example string 2,2,example varchar 2,{\"key2\": \"value2\"}",
+                        "5,1,E019283746,2023-05-01,2023-05-05 14:14:14,8765.4321,8.7654321,8.7654,202,90,example string 5,5,example varchar 5,{\"key5\": \"value5\"}",
+                        "4,0,D564738291,2023-04-01,2023-04-04 13:13:13,4321.8765,4.32187654,4.3211,101,78,example string 4,4,example varchar 4,{\"key4\": \"value4\"}",
+                        "3,1,C102938475,2023-03-01,2023-03-03 12:12:12,5678.1234,5.67812345,5.6789,789,56,example string 3,3,example varchar 3,{\"key3\": \"value3\"}");
         assertContent(dataSource.getConnection(), expected3, "test2.orders4");
     }
 
@@ -190,20 +190,20 @@ public class StarRocks2OBTest extends OceanBaseMySQLTestBase {
         env.execute(migrationConfig.getPipeline().getName());
 
         // table1
-        List<String> expected1 = Collections.singletonList("1,2024-12-05T10:28:07,xx,2.3,1,true");
+        List<String> expected1 = Collections.singletonList("1,2024-12-05 10:28:07,xx,2.3,1,1");
         assertContent(dataSource.getConnection(), expected1, "test1.orders1");
 
         List<String> expected2 =
-                Collections.singletonList("111,2024-12-05T10:02:31,orders2,2.3,1,1");
+                Collections.singletonList("111,2024-12-05 10:02:31,orders2,2.3,1,1");
         assertContent(dataSource.getConnection(), expected2, "test1.orders2");
 
         List<String> expected3 =
                 Arrays.asList(
-                        "1,1,A123456789,2023-01-01,2023-01-01T10:10:10,1234.5678,1.23456789,1.2345,123,12,example string 1,1,example varchar 1,{\"key1\": \"value1\"}",
-                        "2,0,B987654321,2023-02-01,2023-02-02T11:11:11,9876.5432,9.87654321,9.8765,456,34,example string 2,2,example varchar 2,{\"key2\": \"value2\"}",
-                        "5,1,E019283746,2023-05-01,2023-05-05T14:14:14,8765.4321,8.7654321,8.7654,202,90,example string 5,5,example varchar 5,{\"key5\": \"value5\"}",
-                        "4,0,D564738291,2023-04-01,2023-04-04T13:13:13,4321.8765,4.32187654,4.3211,101,78,example string 4,4,example varchar 4,{\"key4\": \"value4\"}",
-                        "3,1,C102938475,2023-03-01,2023-03-03T12:12:12,5678.1234,5.67812345,5.6789,789,56,example string 3,3,example varchar 3,{\"key3\": \"value3\"}");
+                        "1,1,A123456789,2023-01-01,2023-01-01 10:10:10,1234.5678,1.23456789,1.2345,123,12,example string 1,1,example varchar 1,{\"key1\": \"value1\"}",
+                        "2,0,B987654321,2023-02-01,2023-02-02 11:11:11,9876.5432,9.87654321,9.8765,456,34,example string 2,2,example varchar 2,{\"key2\": \"value2\"}",
+                        "5,1,E019283746,2023-05-01,2023-05-05 14:14:14,8765.4321,8.7654321,8.7654,202,90,example string 5,5,example varchar 5,{\"key5\": \"value5\"}",
+                        "4,0,D564738291,2023-04-01,2023-04-04 13:13:13,4321.8765,4.32187654,4.3211,101,78,example string 4,4,example varchar 4,{\"key4\": \"value4\"}",
+                        "3,1,C102938475,2023-03-01,2023-03-03 12:12:12,5678.1234,5.67812345,5.6789,789,56,example string 3,3,example varchar 3,{\"key3\": \"value3\"}");
         assertContent(dataSource.getConnection(), expected3, "test2.orders4");
     }
 
@@ -233,16 +233,16 @@ public class StarRocks2OBTest extends OceanBaseMySQLTestBase {
         env.execute(jobName);
 
         // table1
-        List<String> expected1 = Collections.singletonList("1,2024-12-05T10:28:07,xx,2.3,1,true");
+        List<String> expected1 = Collections.singletonList("1,2024-12-05 10:28:07,xx,2.3,1,1");
         assertContent(dataSource.getConnection(), expected1, "test1.orders1");
 
         List<String> expected3 =
                 Arrays.asList(
-                        "1,1,A123456789,2023-01-01,2023-01-01T10:10:10,1234.5678,1.23456789,1.2345,123,12,example string 1,1,example varchar 1,{\"key1\": \"value1\"}",
-                        "2,0,B987654321,2023-02-01,2023-02-02T11:11:11,9876.5432,9.87654321,9.8765,456,34,example string 2,2,example varchar 2,{\"key2\": \"value2\"}",
-                        "5,1,E019283746,2023-05-01,2023-05-05T14:14:14,8765.4321,8.7654321,8.7654,202,90,example string 5,5,example varchar 5,{\"key5\": \"value5\"}",
-                        "4,0,D564738291,2023-04-01,2023-04-04T13:13:13,4321.8765,4.32187654,4.3211,101,78,example string 4,4,example varchar 4,{\"key4\": \"value4\"}",
-                        "3,1,C102938475,2023-03-01,2023-03-03T12:12:12,5678.1234,5.67812345,5.6789,789,56,example string 3,3,example varchar 3,{\"key3\": \"value3\"}");
+                        "1,1,A123456789,2023-01-01,2023-01-01 10:10:10,1234.5678,1.23456789,1.2345,123,12,example string 1,1,example varchar 1,{\"key1\": \"value1\"}",
+                        "2,0,B987654321,2023-02-01,2023-02-02 11:11:11,9876.5432,9.87654321,9.8765,456,34,example string 2,2,example varchar 2,{\"key2\": \"value2\"}",
+                        "5,1,E019283746,2023-05-01,2023-05-05 14:14:14,8765.4321,8.7654321,8.7654,202,90,example string 5,5,example varchar 5,{\"key5\": \"value5\"}",
+                        "4,0,D564738291,2023-04-01,2023-04-04 13:13:13,4321.8765,4.32187654,4.3211,101,78,example string 4,4,example varchar 4,{\"key4\": \"value4\"}",
+                        "3,1,C102938475,2023-03-01,2023-03-03 12:12:12,5678.1234,5.67812345,5.6789,789,56,example string 3,3,example varchar 3,{\"key3\": \"value3\"}");
         assertContent(dataSource.getConnection(), expected3, "test2.orders4");
     }
 
@@ -268,24 +268,24 @@ public class StarRocks2OBTest extends OceanBaseMySQLTestBase {
         env.execute(migrationConfig.getPipeline().getName());
 
         // table1
-        List<String> expected1 = Collections.singletonList("1,2024-12-05T10:28:07,xx,2.3,1,true");
+        List<String> expected1 = Collections.singletonList("1,2024-12-05 10:28:07,xx,2.3,1,1");
         assertContent(dataSource.getConnection(), expected1, "test1.order1");
 
         List<String> expected2 =
                 Arrays.asList(
-                        "111,2024-12-05T10:02:31,orders2,2.3,1,1",
-                        "11,2024-12-01T10:03:31,orders3-2-route,2.3,1,1",
-                        "12,2024-12-02T10:02:35,orders3,2.3,1,1",
-                        "10,2024-12-05T10:02:31,orders3,2.3,1,1");
+                        "111,2024-12-05 10:02:31,orders2,2.3,1,1",
+                        "11,2024-12-01 10:03:31,orders3-2-route,2.3,1,1",
+                        "12,2024-12-02 10:02:35,orders3,2.3,1,1",
+                        "10,2024-12-05 10:02:31,orders3,2.3,1,1");
         assertContent(dataSource.getConnection(), expected2, "route.order");
 
         List<String> expected3 =
                 Arrays.asList(
-                        "1,1,A123456789,2023-01-01,2023-01-01T10:10:10,1234.5678,1.23456789,1.2345,123,12,example string 1,1,example varchar 1,{\"key1\": \"value1\"}",
-                        "2,0,B987654321,2023-02-01,2023-02-02T11:11:11,9876.5432,9.87654321,9.8765,456,34,example string 2,2,example varchar 2,{\"key2\": \"value2\"}",
-                        "5,1,E019283746,2023-05-01,2023-05-05T14:14:14,8765.4321,8.7654321,8.7654,202,90,example string 5,5,example varchar 5,{\"key5\": \"value5\"}",
-                        "4,0,D564738291,2023-04-01,2023-04-04T13:13:13,4321.8765,4.32187654,4.3211,101,78,example string 4,4,example varchar 4,{\"key4\": \"value4\"}",
-                        "3,1,C102938475,2023-03-01,2023-03-03T12:12:12,5678.1234,5.67812345,5.6789,789,56,example string 3,3,example varchar 3,{\"key3\": \"value3\"}");
+                        "1,1,A123456789,2023-01-01,2023-01-01 10:10:10,1234.5678,1.23456789,1.2345,123,12,example string 1,1,example varchar 1,{\"key1\": \"value1\"}",
+                        "2,0,B987654321,2023-02-01,2023-02-02 11:11:11,9876.5432,9.87654321,9.8765,456,34,example string 2,2,example varchar 2,{\"key2\": \"value2\"}",
+                        "5,1,E019283746,2023-05-01,2023-05-05 14:14:14,8765.4321,8.7654321,8.7654,202,90,example string 5,5,example varchar 5,{\"key5\": \"value5\"}",
+                        "4,0,D564738291,2023-04-01,2023-04-04 13:13:13,4321.8765,4.32187654,4.3211,101,78,example string 4,4,example varchar 4,{\"key4\": \"value4\"}",
+                        "3,1,C102938475,2023-03-01,2023-03-03 12:12:12,5678.1234,5.67812345,5.6789,789,56,example string 3,3,example varchar 3,{\"key3\": \"value3\"}");
         assertContent(dataSource.getConnection(), expected3, "test2.orders4");
 
         // Do clean

@@ -178,7 +178,7 @@ public abstract class OceanBaseMySQLTestBase {
             if (i != 0) {
                 sb.append(",");
             }
-            sb.append(rs.getObject(i + 1));
+            sb.append(rs.getString(i + 1));
         }
         return sb.toString();
     }
