@@ -102,7 +102,7 @@ public class StarRocks2OBTest extends OceanBaseMySQLTestBase {
             }
         }
         FIX_CONTAINER.setWaitStrategy(Wait.forLogMessage(".*boot success!.*", 1));
-        FIX_CONTAINER.withLogConsumer(new Slf4jLogConsumer(LOG)).start();
+        Startables.deepStart(Stream.of(FIX_CONTAINER)).join();
         LOG.info("Containers are started.");
     }
 
