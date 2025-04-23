@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -174,6 +175,7 @@ public abstract class OceanBaseMySQLTestBase {
 
     protected String getRowString(ResultSet rs, int columnCount) throws SQLException {
         StringBuilder sb = new StringBuilder();
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
         for (int i = 0; i < columnCount; i++) {
             if (i != 0) {
                 sb.append(",");
