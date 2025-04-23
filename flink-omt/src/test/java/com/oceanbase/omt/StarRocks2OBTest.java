@@ -77,6 +77,9 @@ public class StarRocks2OBTest extends OceanBaseMySQLTestBase {
     @BeforeClass
     public static void startContainers() {
         LOG.info("Starting containers...");
+        FIX_CONTAINER.setWaitStrategy(Wait.forLogMessage(".*boot success!.*", 1));
+        Startables.deepStart(Stream.of(FIX_CONTAINER)).join();
+
         Startables.deepStart(Stream.of(STARROCKS_CONTAINER)).join();
         LOG.info("Waiting for StarRocks to launch");
 
@@ -101,8 +104,6 @@ public class StarRocks2OBTest extends OceanBaseMySQLTestBase {
                 // ignore and check next round
             }
         }
-        FIX_CONTAINER.setWaitStrategy(Wait.forLogMessage(".*boot success!.*", 1));
-        Startables.deepStart(Stream.of(FIX_CONTAINER)).join();
         LOG.info("Containers are started.");
     }
 
