@@ -38,7 +38,6 @@ import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.lifecycle.Startables;
 
 import javax.sql.DataSource;
@@ -77,8 +76,12 @@ public class StarRocks2OBTest extends OceanBaseMySQLTestBase {
     @BeforeClass
     public static void startContainers() {
         LOG.info("Starting containers...");
-        FIX_CONTAINER.setWaitStrategy(Wait.forLogMessage(".*boot success!.*", 1));
-        Startables.deepStart(Stream.of(FIX_CONTAINER)).join();
+        FIX_CONTAINER.waitingFor(
+                new LogMessageWaitStrategy()
+                        .withRegEx(".*boot success!.*")
+                        .withTimes(1)
+                        .withStartupTimeout(Duration.ofMinutes(6)));
+        FIX_CONTAINER.start();
 
         Startables.deepStart(Stream.of(STARROCKS_CONTAINER)).join();
         LOG.info("Waiting for StarRocks to launch");
