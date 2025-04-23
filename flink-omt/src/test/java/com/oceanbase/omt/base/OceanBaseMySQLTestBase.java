@@ -65,7 +65,7 @@ public abstract class OceanBaseMySQLTestBase {
             new FixedHostPortGenericContainer<>("oceanbase/oceanbase-ce:latest")
                     .withNetwork(NETWORK)
                     .withEnv("OB_TENANT_PASSWORD", TEST_PASSWORD)
-                    .withEnv("MODE", "mini")
+                    .withEnv("MODE", "slim")
                     .withEnv("OB_CLUSTER_NAME", CLUSTER_NAME)
                     .withEnv("OB_SYS_PASSWORD", SYS_PASSWORD)
                     .withEnv("OB_DATAFILE_SIZE", "2G")
