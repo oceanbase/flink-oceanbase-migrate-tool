@@ -21,7 +21,8 @@ under the License.
         <version>${revision}</version>
     </parent>
     <artifactId>flink-omt</artifactId>
-    <version>${revision}_flink-${flink.majorVersion}</version>
+    <version>flink_${flink.majorVersion}-${revision}</version>
+    <name>flink-omt</name>
 
     <properties>
         <slf4j.version>1.7.36</slf4j.version>
@@ -109,6 +110,7 @@ under the License.
                         <configuration>
                             <classifier>javadoc</classifier>
                             <classesDirectory>${basedir}/src/main/java</classesDirectory>
+                            <outputDirectory />
                         </configuration>
                     </execution>
                 </executions>

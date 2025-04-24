@@ -348,9 +348,9 @@ under the License.
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/oceanbase/flink-omt.git</connection>
-        <developerConnection>scm:git:https://github.com/oceanbase/flink-omt.git</developerConnection>
-        <url>https://github.com/oceanbase/flink-omt</url>
+        <connection>scm:git:https://github.com/oceanbase/flink-oceanbase-migrate-tool.git</connection>
+        <developerConnection>scm:git:https://github.com/oceanbase/flink-oceanbase-migrate-tool.git</developerConnection>
+        <url>https://github.com/oceanbase/flink-oceanbase-migrate-tool</url>
         <tag>HEAD</tag>
     </scm>
 
