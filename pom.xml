@@ -31,7 +31,7 @@ under the License.
     </modules>
 
     <properties>
-        <revision>1.0</revision>
+        <revision>1.1-SNAPSHOT</revision>
         <flink.version>1.18.0</flink.version>
         <flink.majorVersion>1.18</flink.majorVersion>
         <scala.binary.version>2.12</scala.binary.version>
