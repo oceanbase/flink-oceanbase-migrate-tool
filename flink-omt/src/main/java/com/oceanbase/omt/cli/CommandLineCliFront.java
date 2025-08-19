@@ -22,6 +22,7 @@ import com.oceanbase.omt.parser.MigrationConfig;
 import com.oceanbase.omt.parser.PipelineConfig;
 import com.oceanbase.omt.parser.YamlParser;
 import com.oceanbase.omt.source.clickhouse.ClickHouseDatabaseSync;
+import com.oceanbase.omt.source.doris.DorisDatabaseSync;
 import com.oceanbase.omt.source.starrocks.StarRocksDatabaseSync;
 
 import org.apache.flink.annotation.VisibleForTesting;
@@ -32,6 +33,7 @@ import org.apache.flink.util.CollectionUtil;
 import org.apache.flink.util.Preconditions;
 import org.apache.flink.util.StringUtils;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -57,6 +59,11 @@ public class CommandLineCliFront {
             case DatabaseSyncConfig.CLICKHOUSE_TYPE:
                 createClickHouseSyncDatabase(migrationConfig);
                 break;
+
+            case DatabaseSyncConfig.DORIS_TYPE:
+                createDorisSyncDatabase(migrationConfig);
+                break;
+
             default:
                 System.out.println("Unknown source type " + type);
                 System.exit(1);
@@ -111,35 +118,36 @@ public class CommandLineCliFront {
         }
     }
 
-    private static void CheckInfoPrinter(
-            MigrationConfig migrationConfig, ClickHouseDatabaseSync clickHouseDatabaseSync) {
-        List<OceanBaseTable> obTables = clickHouseDatabaseSync.getObTables();
-        if (CollectionUtil.isNullOrEmpty(obTables)) {
-            String format =
-                    "\n ============= Warning: No tables were found with [(%s)] to migrate, the job will exit. ============";
-            System.err.println(String.format(format, migrationConfig.getSource().getTables()));
-            System.exit(1);
+    private static void createDorisSyncDatabase(MigrationConfig migrationConfig) throws Exception {
+        DorisDatabaseSync dorisDatabaseSync = new DorisDatabaseSync(migrationConfig);
+        try {
+            CheckInfoPrinter(migrationConfig, dorisDatabaseSync);
+            dorisDatabaseSync.createTableInOb();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to create tables in OceanBase", e);
+        }
+
+        System.out.println(
+                "The above table has been created in OceanBase."
+                        + "Please check whether it meets your expectations. \n"
+                        + "If it does, enter Y and press Enter to start data migration."
+                        + "Otherwise, enter N and the tool will exit.(Y/N)\n");
+        Scanner scanner = new Scanner(System.in);
+        String nextLine = scanner.nextLine();
+        if ("Y".equalsIgnoreCase(nextLine)) {
+            System.out.println("Starting data migration.");
+            submitFlinkJob(dorisDatabaseSync, migrationConfig);
+        } else if ("N".equalsIgnoreCase(nextLine)) {
+            System.out.println("Flink-OMT exited!");
+            System.exit(0);
         } else {
-            String welInfo =
-                    String.format(
-                            "============= The following tables will be migrate from %s to oceanbase ============",
-                            migrationConfig.getSource().getType());
-            System.out.println(welInfo);
-            obTables.forEach(
-                    oceanBaseTable -> {
-                        String table =
-                                String.format(
-                                        "%s.%s",
-                                        oceanBaseTable.getDatabase(), oceanBaseTable.getTable());
-                        System.out.println(table);
-                    });
-            System.out.println();
+            System.exit(0);
         }
     }
 
     private static void CheckInfoPrinter(
-            MigrationConfig migrationConfig, StarRocksDatabaseSync starRocksDatabaseSync) {
-        List<OceanBaseTable> obTables = starRocksDatabaseSync.getObTables();
+            MigrationConfig migrationConfig, DatabaseSyncBase databaseSyncBase) throws Exception {
+        List<OceanBaseTable> obTables = databaseSyncBase.getObTables();
         if (CollectionUtil.isNullOrEmpty(obTables)) {
             String format =
                     "\n ============= Warning: No tables were found with [(%s)] to migrate, the job will exit. ============";

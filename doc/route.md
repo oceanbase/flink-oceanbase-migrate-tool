@@ -1,24 +1,26 @@
-# 定义 
-  
-**Route**指定了匹配源表列表并映射到目的表表的规则。最典型的场景是分库分表的合并，将多个上游源表路由到同一个目的表。
+# Route Definition
 
-# 参数 
-  
-要描述一条Route，需要满足以下条件：
+[English](route.md) | [中文文档](route_CN.md)
 
-| parameter | 意义 | 可选/必需 |
-| --- | --- | --- |
-| source-table  | 源表id，支持正则表达式 | 必需的 |
-| sink-table   | Sink表id | 必需的 |
-| description | 路由规则说明 | 可选的 |
+**Route** specifies rules for matching source table lists and mapping them to destination tables. The most typical scenario is the merging of sharded databases and tables, routing multiple upstream source tables to the same destination table.
 
+# Parameters
 
-  
-路由模块可以包含源表/接收器表规则的列表。
+To describe a Route, the following conditions must be met:
 
-# 示例
-## 将一张数据源表路由到一张数据接收器表 
-如果将数据库`mydb`中的表`web_order`同步到 OB 表`ods_web_order` ，我们可以使用这个 yaml 文件来定义这条路由：
+| Parameter | Meaning | Optional/Required |
+|-----------|---------|-------------------|
+| source-table | Source table id, supports regular expressions | Required |
+| sink-table | Sink table id | Required |
+| description | Route rule description | Optional |
+
+The routing module can contain a list of source table/sink table rules.
+
+# Examples
+
+## Route One Source Table to One Sink Table
+
+If you want to synchronize table `web_order` from database `mydb` to OB table `ods_web_order`, you can use this yaml file to define this route:
 
 ```yaml
 route:
@@ -27,8 +29,9 @@ route:
     description: sync table to one destination table with given prefix ods_
 ```
 
-## 将多个数据源表路由到一个数据接收器表
-另外，如果要将数据库`mydb`中的sharding表同步到 OB 表`ods_web_order` ，我们可以使用这个 yaml 文件来定义这个路由：
+## Route Multiple Source Tables to One Sink Table
+
+Additionally, if you want to synchronize sharding tables from database `mydb` to OB table `ods_web_order`, you can use this yaml file to define this route:
 
 ```yaml
 route:
@@ -37,8 +40,9 @@ route:
     description: sync sharding tables to one destination table
 ```
 
-## 通过组合路由规则实现复杂路由
-另外，如果你想指定多种不同的映射规则，我们可以使用这个yaml文件来定义这个路由：
+## Implement Complex Routing Through Combined Route Rules
+
+Additionally, if you want to specify multiple different mapping rules, you can use this yaml file to define this route:
 
 ```yaml
 route:

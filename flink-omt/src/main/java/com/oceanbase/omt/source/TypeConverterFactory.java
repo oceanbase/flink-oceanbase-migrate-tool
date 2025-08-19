@@ -16,6 +16,7 @@
 package com.oceanbase.omt.source;
 
 import com.oceanbase.omt.source.clickhouse.ClickHouseTypeConverter;
+import com.oceanbase.omt.source.doris.DorisTypeConverter;
 import com.oceanbase.omt.source.starrocks.StarRocksTypeConverter;
 
 import java.util.HashMap;
@@ -27,6 +28,7 @@ public class TypeConverterFactory {
     static {
         converters.put(DataSourceType.STAR_ROCKS, new StarRocksTypeConverter());
         converters.put(DataSourceType.CLICK_HOUSE, new ClickHouseTypeConverter());
+        converters.put(DataSourceType.DORIS, new DorisTypeConverter());
     }
 
     public static TypeConverter getConverter(DataSourceType type) {

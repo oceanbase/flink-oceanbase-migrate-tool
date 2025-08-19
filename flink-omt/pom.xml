@@ -47,10 +47,24 @@ under the License.
             <version>1.2.10_flink-${flink.majorVersion}</version>
         </dependency>
 
+        <!-- Doris Flink Connector -->
+        <dependency>
+            <groupId>org.apache.doris</groupId>
+            <artifactId>flink-doris-connector-${flink.majorVersion}</artifactId>
+            <version>25.1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-common</artifactId>
-            <version>1.18.0</version>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-base</artifactId>
+            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -102,8 +116,8 @@ under the License.
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-runtime</artifactId>
-            <version>1.18.0</version>
-            <scope>compile</scope>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -153,6 +167,7 @@ under the License.
                                     <include>com.alipay.sofa.common:sofa-common-tools</include>
                                     <include>mysql:mysql-connector-java</include>
                                     <include>com.starrocks:*</include>
+                                    <include>org.apache.doris:*</include>
                                     <include>io.netty:*</include>
                                     <include>com.zaxxer:HikariCP</include>
                                     <include>commons-lang:commons-lang</include>

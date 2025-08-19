@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oceanbase.omt;
+package com.oceanbase.omt.source.doris;
 
-public interface DatabaseSyncConfig {
-    String CONFIG_FILE = "config";
+import com.oceanbase.omt.catalog.OceanBaseColumn;
+import com.oceanbase.omt.source.TypeConverter;
 
-    // Source type
-    String STARROCKS_TYPE = "starrocks";
+import org.apache.flink.table.types.logical.LogicalType;
 
-    String CLICKHOUSE_TYPE = "clickhouse";
+public class DorisTypeConverter implements TypeConverter {
 
-    String DORIS_TYPE = "doris";
+    @Override
+    public LogicalType convert(OceanBaseColumn oceanBaseColumn) {
+        return DorisType.toFlinkDataType(oceanBaseColumn);
+    }
 }

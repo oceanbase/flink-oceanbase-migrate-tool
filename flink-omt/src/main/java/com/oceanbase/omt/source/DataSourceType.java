@@ -25,7 +25,8 @@ import java.util.function.Function;
 @Getter
 public enum DataSourceType {
     STAR_ROCKS("starrocks"),
-    CLICK_HOUSE("clickhouse");
+    CLICK_HOUSE("clickhouse"),
+    DORIS("doris");
 
     private String value;
 

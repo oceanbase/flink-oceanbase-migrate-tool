@@ -32,11 +32,14 @@ import com.oceanbase.omt.parser.Route;
 import com.oceanbase.omt.utils.OBSinkType;
 import com.oceanbase.omt.utils.OceanBaseUserInfo;
 
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.connector.sink2.Sink;
+import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.TaskManagerOptions;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -88,9 +91,19 @@ public abstract class DatabaseSyncBase {
         DataStream<DataChangeRecord> recordDataStream = null;
         for (int i = 0; i < oceanBaseTables.size(); i++) {
             OceanBaseTable oceanBaseTable = oceanBaseTables.get(i);
+            DataStreamSource<RowData> rowDataDataStreamSource = null;
+            if (buildSource(oceanBaseTable) == null) {
+                rowDataDataStreamSource = env.addSource(buildSourceFunction(oceanBaseTable));
+            } else {
+                rowDataDataStreamSource =
+                        env.fromSource(
+                                buildSource(oceanBaseTable),
+                                WatermarkStrategy.noWatermarks(),
+                                buildSourceDescription(oceanBaseTable));
+            }
             if (i == 0) {
                 source =
-                        env.addSource(buildSourceFunction(oceanBaseTable))
+                        rowDataDataStreamSource
                                 .returns(new TypeHint<RowData>() {})
                                 .setParallelism(sourceParallel)
                                 .map(
@@ -101,7 +114,7 @@ public abstract class DatabaseSyncBase {
                 continue;
             }
             SingleOutputStreamOperator<DataChangeRecord> otherSource =
-                    env.addSource(buildSourceFunction(oceanBaseTable))
+                    rowDataDataStreamSource
                             .returns(new TypeHint<RowData>() {})
                             .setParallelism(sourceParallel)
                             .map(
@@ -143,7 +156,13 @@ public abstract class DatabaseSyncBase {
         }
     }
 
-    public abstract SourceFunction<RowData> buildSourceFunction(OceanBaseTable oceanBaseTable);
+    public SourceFunction<RowData> buildSourceFunction(OceanBaseTable oceanBaseTable) {
+        return null;
+    };
+
+    public Source<RowData, ?, ?> buildSource(OceanBaseTable oceanBaseTable) {
+        return null;
+    }
 
     protected OceanBaseSink<DataChangeRecord> buildOceanBaseSink() {
         OceanBaseConnectorOptions connectorOptions = buildConnectionOptions();

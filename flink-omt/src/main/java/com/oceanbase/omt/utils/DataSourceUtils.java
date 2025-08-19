@@ -51,15 +51,19 @@ public class DataSourceUtils {
 
     public static DataSource getSourceDataSource(SourceMigrateConfig sourceMigrateConfig) {
         Map<String, String> other = sourceMigrateConfig.getOther();
+
         if (sourceSource == null) {
             synchronized (DataSourceUtils.class) {
                 if (sourceSource == null) {
                     HikariConfig config = new HikariConfig();
+
+                    // 根据数据源类型选择配置
+
                     config.setJdbcUrl(other.get(StarRocksConfig.JDBC_URL));
                     config.setUsername(other.get(StarRocksConfig.USERNAME));
                     config.setPassword(other.get(StarRocksConfig.PASSWORD));
-                    config.setMaximumPoolSize(10);
 
+                    config.setMaximumPoolSize(10);
                     sourceSource = new HikariDataSource(config);
                 }
             }

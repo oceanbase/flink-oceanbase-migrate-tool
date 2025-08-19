@@ -21,6 +21,7 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.yaml.YA
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Paths;
 
 public class YamlParser {
@@ -34,5 +35,11 @@ public class YamlParser {
     public static MigrationConfig parseResource(String path) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         return mapper.readValue(Resources.getResource(path).openStream(), MigrationConfig.class);
+    }
+
+    /** 从字符串解析 YAML 配置。 */
+    public static MigrationConfig parseFromString(String yamlContent) throws IOException {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        return mapper.readValue(new StringReader(yamlContent), MigrationConfig.class);
     }
 }

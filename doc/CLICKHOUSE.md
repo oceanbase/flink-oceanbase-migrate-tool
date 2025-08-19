@@ -1,8 +1,10 @@
 # ClickHouse Source
 
-## 示例
+[中文文档](CLICKHOUSE_CN.md) | [English](CLICKHOUSE.md)
 
-从 ClickHouse 读取数据同步到 OceanBase 的 Pipeline 可以定义如下：
+## Example
+
+A pipeline for reading data from ClickHouse and writing to OceanBase can be defined as:
 
 ```yaml
 source:
@@ -13,7 +15,7 @@ source:
   parallelism: 4
   database: test
   tables: order
-
+  
 routes:
   - source-table: test1.orders1
     sink-table: test1.order1
@@ -31,38 +33,39 @@ oceanbase:
 pipeline:
   name: Test sync ClickHouse to OB
   parallelism: 2
+
 ```
 
-## ClickHouse Source配置项
+## ClickHouse Source Configuration
 
-|    参数    | 是否必填 |  数据类型  |                                     描述                                     |
-|----------|------|--------|----------------------------------------------------------------------------|
-| type     | 是    | STRING | 固定设置为 `ClickHouse`。                                                        |
-| jdbc-url | 是    | STRING | ClickHouse jdbc url 。格式如下：`jdbc:clickhouse://<host>:<port>`。默认端口号为 `8123`。 |
-| username | 是    | STRING | 用于访问 ClickHouse 的用户名。该账号需具备待读取数据的 ClickHouse表的读权限。。                        |
-| password | 是    | STRING | 用于访问 ClickHouse的用户密码。                                                      |
-| database | 是    | STRING | 待读取数据的 ClickHouse 数据库的名称。                                                  |
-| tables   | 是    | STRING | 待读取数据的 ClickHouse表的名称。                                                     |
+| Parameter | Required | Data Type |                                                           Description                                                            |
+|-----------|----------|-----------|----------------------------------------------------------------------------------------------------------------------------------|
+| type      | Yes      | STRING    | Must be set to `ClickHouse`.                                                                                                     |
+| jdbc-url  | Yes      | STRING    | ClickHouse jdbc url . The format is as follows: `jdbc:clickhouse://<host>:<port>`. The default port number is `8123`.            |
+| username  | Yes      | STRING    | The username used to access ClickHouse. This account must have read permissions to the ClickHouse table for the data to be read. |
+| password  | Yes      | STRING    | User password to access ClickHouse.                                                                                              |
+| database  | Yes      | STRING    | Source database name.                                                                                                            |
+| tables    | Yes      | STRING    | Source table name.                                                                                                               |
 
-## 数据类型映射
+## Data Type Mapping
 
-|           ClickHouse type           | OceanBase type | NOTE |
-|-------------------------------------|----------------|------|
-| String/FixedString/ IP/UUID/Enum    | VARBINARY(n)   |      |
-| Int8                                | TINYINT        |      |
-| INT                                 | INT            |      |
-| Int16/UInt8                         | SMALLINT       |      |
-| Int32/UInt16                        | BIGINT         |      |
-| Int64/UInt32/UInt64                 | FLOAT          |      |
-| Int128/nt256/UInt64/UInt128/UInt256 | DECIMAL(38, 0) |      |
-| Float32                             | FLOAT          |      |
-| Float64                             | DOUBLE         |      |
-| Decimal                             | DECIMAL        |      |
-| Date                                | DATE           |      |
-| DateTime/DateTime32/DateTime64      | DATETIME       |      |
-| ARRAY                               |                | 暂不支持 |
-| MAP                                 |                | 暂不支持 |
-| Tuple                               |                | 暂不支持 |
-| Nested                              |                | 暂不支持 |
-| AggregateFuntion                    |                | 暂不支持 |
+| ClickHouse type                     | OceanBase type |     Notes     |
+|-------------------------------------|----------------|---------------|
+| String/FixedString/ IP/UUID/Enum    | VARBINARY(n)   |               |
+| Int8                                | TINYINT        |               |
+| INT                                 | INT            |               |
+| Int16/UInt8                         | SMALLINT       |               |
+| Int32/UInt16                        | BIGINT         |               |
+| Int64/UInt32/UInt64                 | FLOAT          |               |
+| Int128/nt256/UInt64/UInt128/UInt256 | DECIMAL(38, 0) |               |
+| Float32                             | FLOAT          |               |
+| Float64                             | DOUBLE         |               |
+| Decimal                             | DECIMAL        |               |
+| Date                                | DATE           |               |
+| DateTime/DateTime32/DateTime64      | DATETIME       |               |
+| ARRAY                               |                | Not supported |
+| MAP                                 |                | Not supported |
+| Tuple                               |                | Not supported |
+| Nested                              |                | Not supported |
+| AggregateFuntion                    |                | Not supported |
 
