@@ -72,7 +72,7 @@ public class Doris2OBFixPortTest extends OceanBaseMySQLTestBase {
                     .withFixedExposedPort(7040, FE_HTTP_SERVICE_PORT)
                     .withFixedExposedPort(7030, FE_QUERY_PORT)
                     .withFixedExposedPort(7031, SCAN_PORT)
-                    .withFixedExposedPort(7060, 9060)
+                    .withFixedExposedPort(9060, 9060)
                     .withLogConsumer(new Slf4jLogConsumer(LOG));
 
     @BeforeClass

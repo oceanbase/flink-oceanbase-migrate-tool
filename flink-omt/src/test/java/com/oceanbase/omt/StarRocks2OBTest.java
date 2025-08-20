@@ -70,7 +70,7 @@ public class StarRocks2OBTest extends OceanBaseMySQLTestBase {
                     .withFixedExposedPort(FE_HTTP_SERVICE_PORT, FE_HTTP_SERVICE_PORT)
                     .withFixedExposedPort(FE_QUERY_PORT, FE_QUERY_PORT)
                     .withFixedExposedPort(SCAN_PORT, SCAN_PORT)
-                    .withFixedExposedPort(9060, 9060)
+                    .withFixedExposedPort(9050, 9060)
                     .withLogConsumer(new Slf4jLogConsumer(LOG));
 
     @BeforeClass
