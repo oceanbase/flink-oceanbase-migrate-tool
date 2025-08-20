@@ -15,18 +15,20 @@
  */
 package com.oceanbase.omt.source.doris;
 
-/** Doris配置接口，定义Doris数据源的配置参数 */
+/** Doris configuration interface, defines configuration parameters for Doris data source */
 public interface DorisConfig {
     String JDBC_URL = "jdbc-url";
-    /** FE节点的HTTP服务地址，用于通过Web服务器访问FE节点 */
+    /** FE node HTTP service address, used to access FE node through web server */
     String FE_NODES = "fenodes";
 
-    /** FE节点的JDBC连接地址，用于访问FE节点上的MySQL客户端 */
+    String BE_NODES = "benodes";
+
+    /** FE node JDBC connection address, used to access MySQL client on FE node */
     String TABLE_IDENTIFIER = "table.identifier";
 
-    /** 用于访问Doris集群的用户名 */
+    /** Username for accessing Doris cluster */
     String USERNAME = "username";
 
-    /** 用于访问Doris集群的用户密码 */
+    /** Password for accessing Doris cluster */
     String PASSWORD = "password";
 }

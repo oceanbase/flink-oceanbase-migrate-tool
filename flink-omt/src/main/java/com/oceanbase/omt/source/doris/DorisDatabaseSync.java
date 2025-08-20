@@ -27,7 +27,6 @@ import com.oceanbase.omt.utils.OceanBaseJdbcUtils;
 
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.configuration.MemorySize;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.data.RowData;
@@ -38,7 +37,6 @@ import org.apache.doris.flink.cfg.DorisOptions;
 import org.apache.doris.flink.cfg.DorisReadOptions;
 import org.apache.doris.flink.deserialization.RowDataDeserializationSchema;
 import org.apache.doris.flink.source.DorisSource;
-import org.apache.doris.flink.table.DorisConfigOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +53,10 @@ import java.util.stream.Collectors;
 import static com.oceanbase.omt.source.doris.DorisJdbcUtils.executeDoubleColumnStatement;
 import static com.oceanbase.omt.source.doris.DorisJdbcUtils.obtainPartitionInfo;
 
-/** Doris数据库同步类，实现从Doris到OceanBase的数据同步功能 */
+/**
+ * Doris database synchronization class, implements data synchronization functionality from Doris to
+ * OceanBase
+ */
 public class DorisDatabaseSync extends DatabaseSyncBase {
     private static final Logger LOG = LoggerFactory.getLogger(DorisDatabaseSync.class);
     private List<OceanBaseTable> oceanBaseTables;
@@ -76,12 +77,12 @@ public class DorisDatabaseSync extends DatabaseSyncBase {
 
     @Override
     public void checkRequiredOptions() {
-        // TODO: Add check for require options
+        // TODO: Add check for required options
     }
 
     @Override
     public List<OceanBaseTable> getObTables() {
-        // Only as a simple cache.
+        // Only as a simple cache
         if (Objects.nonNull(oceanBaseTables)) {
             return oceanBaseTables;
         }
@@ -258,28 +259,7 @@ public class DorisDatabaseSync extends DatabaseSyncBase {
                         .setPassword(other.get(DorisConfig.PASSWORD))
                         .build();
 
-        DorisReadOptions.Builder readOptionBuilder = DorisReadOptions.builder();
-        if (Objects.nonNull(other.get(DorisConfigOptions.DORIS_EXEC_MEM_LIMIT.key()))) {
-            readOptionBuilder.setExecMemLimit(
-                    MemorySize.parse(other.get(DorisConfigOptions.DORIS_EXEC_MEM_LIMIT.key()))
-                            .getBytes());
-        }
-        if (Objects.nonNull(other.get(DorisConfigOptions.DORIS_BATCH_SIZE.key()))) {
-            readOptionBuilder.setRequestBatchSize(
-                    Integer.parseInt(other.get(DorisConfigOptions.DORIS_BATCH_SIZE.key())));
-        }
-        if (Objects.nonNull(other.get(DorisConfigOptions.DORIS_TABLET_SIZE.key()))) {
-            readOptionBuilder.setRequestTabletSize(
-                    Integer.parseInt(other.get(DorisConfigOptions.DORIS_TABLET_SIZE.key())));
-        }
-        if (Objects.nonNull(other.get(DorisConfigOptions.DORIS_REQUEST_QUERY_TIMEOUT_S.key()))) {
-            String queryTimeout = other.get(DorisConfigOptions.DORIS_REQUEST_QUERY_TIMEOUT_S.key());
-            if (queryTimeout.endsWith("s")) {
-                queryTimeout = queryTimeout.replace("s", "");
-            }
-            readOptionBuilder.setRequestQueryTimeoutS(Integer.parseInt(queryTimeout));
-        }
-        DorisReadOptions readOptions = readOptionBuilder.build();
+        DorisReadOptions readOptions = DorisReadOptions.builder().build();
         RowType rowType = (RowType) tableSchema.toRowDataType().getLogicalType();
 
         return DorisSource.<RowData>builder()

@@ -58,7 +58,7 @@ public class DorisPartitionUtils {
         }
     }
 
-    // range suppor  String DATE BIGINT
+    // range supports String DATE BIGINT
     public static List<RangeInfo> extractPartitionInfo(
             String input, List<String> partitionKeyTypes) {
         List<RangeInfo> rangeInfos = new ArrayList<>();
@@ -66,7 +66,7 @@ public class DorisPartitionUtils {
         String regex = "types:\\s*\\[(.*?)]\\s*;\\s*keys:\\s*\\[(.*?)]";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(input);
-        // if Multiple partition fields
+        // if multiple partition fields
         while (matcher.find()) {
             String type = matcher.group(1).trim();
             StringBuilder comKey = getComKey(matcher, type, partitionKeyTypes);

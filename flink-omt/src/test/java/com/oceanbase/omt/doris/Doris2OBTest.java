@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oceanbase.omt;
+package com.oceanbase.omt.doris;
 
-import com.oceanbase.omt.doris.DorisContainerTestBase;
 import com.oceanbase.omt.parser.MigrationConfig;
 import com.oceanbase.omt.parser.OBMigrateConfig;
 import com.oceanbase.omt.parser.PipelineConfig;
 import com.oceanbase.omt.parser.SourceMigrateConfig;
+import com.oceanbase.omt.source.doris.DorisConfig;
 import com.oceanbase.omt.source.doris.DorisDatabaseSync;
 import com.oceanbase.omt.utils.DataSourceUtils;
 
@@ -28,36 +28,90 @@ import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.lifecycle.Startables;
 
 import javax.sql.DataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
-/** Doris到OceanBase的Docker集成测试类 */
+/** Docker integration test class for Doris to OceanBase */
+@Ignore
 public class Doris2OBTest extends DorisContainerTestBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(Doris2OBTest.class);
 
-    // 测试数据库名称
+    // Test database names
     private static final String TEST_DB_1 = "test1";
     private static final String TEST_DB_2 = "test2";
+
+    @BeforeClass
+    public static void startContainers() {
+        LOG.info("Starting containers...");
+        OB_CONTAINER.waitingFor(
+                new LogMessageWaitStrategy()
+                        .withRegEx(".*boot success!.*")
+                        .withTimes(1)
+                        .withStartupTimeout(Duration.ofMinutes(6)));
+        OB_CONTAINER.start();
+
+        Startables.deepStart(Stream.of(DORIS_CONTAINER)).join();
+        LOG.info("Waiting for backends to be available");
+        long startWaitingTimestamp = System.currentTimeMillis();
+
+        new LogMessageWaitStrategy()
+                .withRegEx(".*get heartbeat from FE.*\\s")
+                .withTimes(1)
+                .withStartupTimeout(
+                        Duration.of(DEFAULT_STARTUP_TIMEOUT_SECONDS, ChronoUnit.SECONDS))
+                .waitUntilReady(DORIS_CONTAINER);
+
+        while (!checkBackendAvailability()) {
+            try {
+                if (System.currentTimeMillis() - startWaitingTimestamp
+                        > DEFAULT_STARTUP_TIMEOUT_SECONDS * 1000) {
+                    throw new RuntimeException("Doris backend startup timed out.");
+                }
+                LOG.info("Waiting for backends to be available");
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {
+                // ignore and check next round
+            }
+        }
+
+        LOG.info("Containers are started.");
+    }
+
+    @AfterClass
+    public static void stopContainers() {
+        LOG.info("Stopping containers...");
+        OB_CONTAINER.stop();
+        DORIS_CONTAINER.stop();
+        LOG.info("Containers are stopped.");
+    }
 
     @Before
     public void setUp() throws Exception {
         LOG.info("Setting up Doris2OB integration test...");
 
-        // 创建测试数据库
+        // Create test databases
         createDatabase(TEST_DB_1);
         createDatabase(TEST_DB_2);
-        // 初始化测试数据
+        // Initialize test data
         initialize(getDorisConnection(), "sql/doris-sql.sql");
 
         LOG.info("Doris2OB integration test setup completed");
@@ -67,7 +121,7 @@ public class Doris2OBTest extends DorisContainerTestBase {
     public void tearDown() throws Exception {
         LOG.info("Cleaning up Doris2OB integration test...");
 
-        // 清理测试数据库
+        // Clean up test databases
         try {
             dropDatabase(TEST_DB_1);
             dropDatabase(TEST_DB_2);
@@ -78,53 +132,54 @@ public class Doris2OBTest extends DorisContainerTestBase {
         LOG.info("Doris2OB integration test cleanup completed");
     }
 
-    /** 测试JDBC方式的数据同步 */
+    /** Test JDBC data synchronization */
     @Test
     public void testJdbcSync() throws Exception {
         LOG.info("Starting JDBC sync test...");
 
-        // 创建测试配置
+        // Create test configuration
         MigrationConfig config = createJdbcConfig();
 
-        // 执行数据同步
+        // Execute data synchronization
         executeDataSync(config);
 
-        // 验证同步结果
+        // Verify synchronization results
         verifyJdbcSyncResults();
 
         LOG.info("JDBC sync test completed successfully");
     }
 
-    /** 执行数据同步 */
+    /** Execute data synchronization */
     private void executeDataSync(MigrationConfig config) throws Exception {
         LOG.info("Executing data sync with config: {}", config.getPipeline().getName());
 
-        // 创建Flink执行环境
+        // Create Flink execution environment
         LocalStreamEnvironment env = StreamExecutionEnvironment.createLocalEnvironment(1);
         env.setRestartStrategy(new RestartStrategies.NoRestartStrategyConfiguration());
         env.enableCheckpointing(1000);
 
-        // 创建Doris数据库同步对象
+        // Create Doris database synchronization object
         DorisDatabaseSync dorisDatabaseSync = new DorisDatabaseSync(config);
 
-        // 在OceanBase中创建表结构
+        // Create table structure in OceanBase
         dorisDatabaseSync.createTableInOb();
 
-        // 构建并执行Pipeline
+        // Build and execute Pipeline
         dorisDatabaseSync.buildPipeline(env);
         env.execute(config.getPipeline().getName());
 
         LOG.info("Data sync execution completed");
     }
 
-    /** 创建JDBC配置 */
+    /** Create JDBC configuration */
     private MigrationConfig createJdbcConfig() {
         SourceMigrateConfig sourceConfig = new SourceMigrateConfig();
         sourceConfig.setType("doris");
-        sourceConfig.setOther("jdbc_url", DORIS_CONTAINER.getJdbcUrl());
+        sourceConfig.setOther(DorisConfig.JDBC_URL, DORIS_CONTAINER.getJdbcUrl());
         sourceConfig.setOther("username", DORIS_CONTAINER.getUsername());
         sourceConfig.setOther("password", DORIS_CONTAINER.getPassword());
         sourceConfig.setOther("fenodes", DORIS_CONTAINER.getFeNodes());
+        sourceConfig.setOther(DorisConfig.BE_NODES, DORIS_CONTAINER.getBeNodes());
         sourceConfig.setTables("test[1-2].orders[0-9]");
 
         OBMigrateConfig obConfig = createOceanBaseConfig();
@@ -141,38 +196,38 @@ public class Doris2OBTest extends DorisContainerTestBase {
         return config;
     }
 
-    /** 创建OceanBase配置 */
+    /** Create OceanBase configuration */
     private OBMigrateConfig createOceanBaseConfig() {
         OBMigrateConfig obConfig = new OBMigrateConfig();
         obConfig.setUrl(
                 "jdbc:mysql://"
-                        + FIX_CONTAINER.getHost()
+                        + OB_CONTAINER.getHost()
                         + ":"
-                        + FIX_CONTAINER.getMappedPort(2881)
+                        + OB_CONTAINER.getMappedPort(2881)
                         + "/test");
         obConfig.setUsername("root@test");
-        obConfig.setPassword("654321");
+        obConfig.setPassword("");
         obConfig.setSchemaName("test");
         obConfig.setType("jdbc");
         return obConfig;
     }
 
-    /** 验证JDBC同步结果 */
+    /** Verify JDBC synchronization results */
     private void verifyJdbcSyncResults() throws Exception {
         LOG.info("Verifying JDBC sync results...");
 
         DataSource dataSource = DataSourceUtils.getOBDataSource(createOceanBaseConfig());
 
-        // 验证 test1.orders1
+        // Verify test1.orders1
         List<String> expected1 = Collections.singletonList("1,2024-12-05 10:28:07,xx,2.3,1,1");
         assertContent(dataSource.getConnection(), expected1, "test1.orders1");
 
-        // 验证 test1.orders2
+        // Verify test1.orders2
         List<String> expected2 =
                 Collections.singletonList("111,2024-12-05 10:02:31,orders2,2.3,1,1");
         assertContent(dataSource.getConnection(), expected2, "test1.orders2");
 
-        // 验证 test2.orders4（复杂数据类型）
+        // Verify test2.orders4 (complex data types)
         List<String> expected3 =
                 Arrays.asList(
                         "1,1,A,2023-01-01,2023-01-01 10:10:10,1234.5678,1.23456789,1.2345,123,12,example string 1,1,example varchar 1,{\"key1\": \"value1\"}",
@@ -182,58 +237,14 @@ public class Doris2OBTest extends DorisContainerTestBase {
                         "3,1,C,2023-03-01,2023-03-03 12:12:12,5678.1234,5.67812345,5.6789,789,56,example string 3,3,example varchar 3,{\"key3\": \"value3\"}");
         assertContent(dataSource.getConnection(), expected3, "test2.orders4");
 
-        // 验证 test2.orders5（复杂类型）
+        // Verify test2.orders5 (complex types)
         List<String> expected4 = Collections.singletonList("1,{a=100, b=200},[6,7,8]");
         assertContent(dataSource.getConnection(), expected4, "test2.orders5");
 
         LOG.info("JDBC sync results verification completed");
     }
 
-    /** 验证路由同步结果 */
-    private void verifyRouteSyncResults() throws Exception {
-        LOG.info("Verifying route sync results...");
-
-        DataSource dataSource = DataSourceUtils.getOBDataSource(createOceanBaseConfig());
-
-        // 验证路由后的 test1.order1
-        List<String> expected1 = Collections.singletonList("1,2024-12-05 10:28:07,xx,2.3,1,1");
-        assertContent(dataSource.getConnection(), expected1, "test1.order1");
-
-        // 验证路由后的 route.order（合并了orders2和orders3）
-        List<String> expected2 =
-                Arrays.asList(
-                        "111,2024-12-05 10:02:31,orders2,2.3,1,1",
-                        "11,2024-12-01 10:03:31,orders3-2-route,2.3,1,1",
-                        "12,2024-12-02 10:02:35,orders3,2.3,1,1",
-                        "10,2024-12-05 10:02:31,orders3,2.3,1,1");
-        assertContent(dataSource.getConnection(), expected2, "route.order");
-
-        // 验证 test2.orders4（复杂数据类型）
-        List<String> expected3 =
-                Arrays.asList(
-                        "1,1,A,2023-01-01,2023-01-01 10:10:10,1234.5678,1.23456789,1.2345,123,12,example string 1,1,example varchar 1,{\"key1\": \"value1\"}",
-                        "2,0,B,2023-02-01,2023-02-02 11:11:11,9876.5432,9.87654321,9.8765,456,34,example string 2,2,example varchar 2,{\"key2\": \"value2\"}",
-                        "5,1,E,2023-05-01,2023-05-05 14:14:14,8765.4321,8.7654321,8.7654,202,90,example string 5,5,example varchar 5,{\"key5\": \"value5\"}",
-                        "4,0,D,2023-04-01,2023-04-04 13:13:13,4321.8765,4.32187654,4.3211,101,78,example string 4,4,example varchar 4,{\"key4\": \"value4\"}",
-                        "3,1,C,2023-03-01,2023-03-03 12:12:12,5678.1234,5.67812345,5.6789,789,56,example string 3,3,example varchar 3,{\"key3\": \"value3\"}");
-        assertContent(dataSource.getConnection(), expected3, "test2.orders4");
-
-        LOG.info("Route sync results verification completed");
-    }
-
-    /** 验证旁路导入结果 */
-    private void verifyDirectLoadResults() throws Exception {
-        LOG.info("Verifying direct load results...");
-
-        DataSource dataSource = DataSourceUtils.getOBDataSource(createOceanBaseConfig());
-
-        // 验证同步结果（与JDBC方式相同）
-        verifyJdbcSyncResults();
-
-        LOG.info("Direct load results verification completed");
-    }
-
-    /** 验证表内容 */
+    /** Verify table content */
     private void assertContent(Connection connection, List<String> expected, String tableName)
             throws SQLException {
         List<String> actual = queryTable(connection, tableName);

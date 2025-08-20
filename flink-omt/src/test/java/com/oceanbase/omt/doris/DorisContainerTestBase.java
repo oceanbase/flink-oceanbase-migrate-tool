@@ -19,21 +19,14 @@ package com.oceanbase.omt.doris;
 
 import com.oceanbase.omt.base.OceanBaseMySQLTestBase;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
-import org.testcontainers.lifecycle.Startables;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class DorisContainerTestBase extends OceanBaseMySQLTestBase {
 
@@ -45,52 +38,7 @@ public class DorisContainerTestBase extends OceanBaseMySQLTestBase {
     public static final int DEFAULT_STARTUP_TIMEOUT_SECONDS = 240;
 
     private static DorisContainer createDorisContainer() {
-        return new DorisContainer();
-    }
-
-    @BeforeClass
-    public static void startContainers() {
-        LOG.info("Starting containers...");
-        FIX_CONTAINER.waitingFor(
-                new LogMessageWaitStrategy()
-                        .withRegEx(".*boot success!.*")
-                        .withTimes(1)
-                        .withStartupTimeout(Duration.ofMinutes(6)));
-        FIX_CONTAINER.start();
-
-        Startables.deepStart(Stream.of(DORIS_CONTAINER)).join();
-        LOG.info("Waiting for backends to be available");
-        long startWaitingTimestamp = System.currentTimeMillis();
-
-        new LogMessageWaitStrategy()
-                .withRegEx(".*get heartbeat from FE.*\\s")
-                .withTimes(1)
-                .withStartupTimeout(
-                        Duration.of(DEFAULT_STARTUP_TIMEOUT_SECONDS, ChronoUnit.SECONDS))
-                .waitUntilReady(DORIS_CONTAINER);
-
-        while (!checkBackendAvailability()) {
-            try {
-                if (System.currentTimeMillis() - startWaitingTimestamp
-                        > DEFAULT_STARTUP_TIMEOUT_SECONDS * 1000) {
-                    throw new RuntimeException("Doris backend startup timed out.");
-                }
-                LOG.info("Waiting for backends to be available");
-                Thread.sleep(1000);
-            } catch (InterruptedException ignored) {
-                // ignore and check next round
-            }
-        }
-
-        LOG.info("Containers are started.");
-    }
-
-    @AfterClass
-    public static void stopContainers() {
-        LOG.info("Stopping containers...");
-        FIX_CONTAINER.stop();
-        DORIS_CONTAINER.stop();
-        LOG.info("Containers are stopped.");
+        return new DorisContainer(NETWORK);
     }
 
     public static boolean checkBackendAvailability() {
@@ -203,7 +151,10 @@ public class DorisContainerTestBase extends OceanBaseMySQLTestBase {
 
     public static Connection getDorisConnection() {
         try {
-            return DriverManager.getConnection(DORIS_CONTAINER.getJdbcUrl(), "root", "123456");
+            return DriverManager.getConnection(
+                    DORIS_CONTAINER.getJdbcUrl(),
+                    DorisContainer.DORIS_USERNAME,
+                    DorisContainer.DORIS_PASSWORD);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to get connection.", e);
         }

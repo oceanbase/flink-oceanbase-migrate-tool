@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Doris数据类型定义类: see
+ * Doris data type definition class: see
  * https://doris.apache.org/zh-CN/docs/ecosystem/flink-doris-connector/#%E7%B1%BB%E5%9E%8B%E6%98%A0%E5%B0%84
  */
 public class DorisType {
@@ -70,7 +70,7 @@ public class DorisType {
     public static final String BITMAP = "BITMAP";
     public static final String HLL = "HLL";
     public static final String NULL_TYPE = "NULL_TYPE";
-    // This is a bug in doris that can not obtain data-type info from `information_schema`.`COLUMNS`
+    // This is a bug in Doris that cannot obtain data-type info from `information_schema`.`COLUMNS`
     // Now: VARIANT, IPV6, IPV4
     public static final String UNKNOWN = "UNKNOWN";
 

@@ -39,7 +39,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/** Doris到OceanBase的集成测试类 */
+/** Integration test class for Doris to OceanBase */
 @Ignore
 public class Doris2OBLocalTest extends OceanBaseMySQLTestBase {
 
@@ -61,7 +61,7 @@ public class Doris2OBLocalTest extends OceanBaseMySQLTestBase {
     @After
     public void close() throws IOException, SQLException {
         MigrationConfig migrationConfig = YamlParser.parseResource(DORIS_JDBC_YAML);
-        // drop ob
+        // drop OceanBase
         DataSource dataSource = DataSourceUtils.getOBDataSource(migrationConfig.getOceanbase());
         dropDataBases(dataSource.getConnection(), "test1", "test2");
 

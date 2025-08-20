@@ -10,22 +10,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 source:
-  type: doris
-  jdbc-url : jdbc:mysql://localhost:7030
+  type: starrocks
+  jdbc-url : jdbc:mysql://localhost:9030/test
   username: root
   password: ""
-  fenodes: localhost:7031
-  tables: test[1-2].orders[0-9]
+  scan-url: localhost:8030
+  scan.max-retries: 1
+  tables: test[1-2].orders[14]
 
 oceanbase:
-  url: jdbc:mysql://localhost:2771/test
+  type: direct-load
+  url: jdbc:mysql://localhost:2881/test
   username: root@test
+  direct-load.username: root@test
+  host: localhost
+  port: 2882
   password: 654321
   schema-name: test
-  type: jdbc
+  parallel: 1
 
 pipeline:
-  name: Doris to OceanBase Migration Test
-  parallelism: 1 
+  name: Test sync StarRocks to OB
+  parallelism: 2

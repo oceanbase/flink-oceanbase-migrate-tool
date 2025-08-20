@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/** Doris JDBC工具类，提供Doris数据库连接和查询相关的工具方法 */
+/** Doris JDBC utility class, provides utility methods for Doris database connection and query */
 public class DorisJdbcUtils {
     private static final Logger LOG = LoggerFactory.getLogger(DorisJdbcUtils.class);
 

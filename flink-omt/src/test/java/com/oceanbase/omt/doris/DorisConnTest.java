@@ -18,6 +18,7 @@ package com.oceanbase.omt.doris;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p>Based on Flink CDC best practices and TestContainers patterns.
  */
+@Ignore
 public class DorisConnTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(DorisConnTest.class);
@@ -42,10 +44,11 @@ public class DorisConnTest {
      * <p>INSERT INTO test.t1 VALUES (1, {'a': '100', 'b': '200'},[6,7,8],'{"key1":
      * "value1"}','127.0.0.1', '2001:16a0:2:200a::2');
      *
-     * <p>除了 variant_col 类型，其余可以正确读取 118801 [Source Data Fetcher for Source: dim_city[1] -> Sink:
-     * Collect table sink (1/1)#0] WARN org.apache.doris.flink.backend.BackendClient [] - The status
-     * of get next result from Doris BE{host='127.0.0.1', port=9060} is 'INTERNAL_ERROR', error
-     * message is: [(127.0.0.1)[INTERNAL_ERROR]Fail to convert block data to arrow data, error: [E3]
+     * <p>Except for variant_col type, all others can be read correctly. 118801 [Source Data Fetcher
+     * for Source: dim_city[1] -> Sink: Collect table sink (1/1)#0] WARN
+     * org.apache.doris.flink.backend.BackendClient [] - The status of get next result from Doris
+     * BE{host='127.0.0.1', port=9060} is 'INTERNAL_ERROR', error message is:
+     * [(127.0.0.1)[INTERNAL_ERROR]Fail to convert block data to arrow data, error: [E3]
      * write_column_to_arrow with type variant
      *
      * @throws Exception

@@ -22,6 +22,7 @@ import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.oceanbase.OceanBaseCEContainer;
 
 import java.net.URL;
 import java.nio.file.Files;
@@ -50,19 +51,19 @@ public abstract class OceanBaseMySQLTestBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(OceanBaseMySQLTestBase.class);
 
-    private static final int SQL_PORT = 2881;
-    private static final int RPC_PORT = 2882;
+    public static final int SQL_PORT = 2881;
+    public static final int RPC_PORT = 2882;
     private static final int CONFIG_SERVER_PORT = 8080;
     private static final String CONFIG_URL_PATH = "/services?Action=GetObProxyConfig";
 
-    private static final String CLUSTER_NAME = "spark-oceanbase-ci";
-    private static final String TEST_TENANT = "spark";
-    private static final String SYS_PASSWORD = "123456";
-    private static final String TEST_PASSWORD = "654321";
+    public static final String CLUSTER_NAME = "spark-oceanbase-ci";
+    public static final String TEST_TENANT = "spark";
+    public static final String SYS_PASSWORD = "123456";
+    public static final String TEST_PASSWORD = "654321";
 
     public static final Network NETWORK = Network.newNetwork();
 
-    public static final GenericContainer<?> FIX_CONTAINER =
+    public static final FixedHostPortGenericContainer<?> FIX_CONTAINER =
             new FixedHostPortGenericContainer<>("oceanbase/oceanbase-ce:latest")
                     .withNetwork(NETWORK)
                     .withEnv("OB_TENANT_PASSWORD", TEST_PASSWORD)
@@ -74,6 +75,19 @@ public abstract class OceanBaseMySQLTestBase {
                     .withStartupTimeout(Duration.ofMinutes(6))
                     .withFixedExposedPort(2881, 2881)
                     .withFixedExposedPort(2882, 2882)
+                    .withLogConsumer(new Slf4jLogConsumer(LOG));
+
+    public static final GenericContainer<?> OB_CONTAINER =
+            new OceanBaseCEContainer("oceanbase/oceanbase-ce:latest")
+                    .withNetwork(NETWORK)
+                    .withEnv("OB_TENANT_PASSWORD", TEST_PASSWORD)
+                    .withEnv("MODE", "mini")
+                    .withEnv("OB_CLUSTER_NAME", CLUSTER_NAME)
+                    .withEnv("OB_SYS_PASSWORD", SYS_PASSWORD)
+                    .withEnv("OB_DATAFILE_SIZE", "2G")
+                    .withEnv("OB_LOG_DISK_SIZE", "4G")
+                    .withStartupTimeout(Duration.ofMinutes(6))
+                    .withExposedPorts(2881, 2881)
                     .withLogConsumer(new Slf4jLogConsumer(LOG));
 
     private static final Pattern COMMENT_PATTERN = Pattern.compile("^(.*)--.*$");

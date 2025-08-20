@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/** Doris DDL生成工具类，用于生成OceanBase的建表DDL语句 */
+/** Doris DDL generation utility class, used to generate OceanBase table creation DDL statements */
 public class DorisDDLGenTools {
     private static final Logger LOG = LoggerFactory.getLogger(DorisDDLGenTools.class);
 

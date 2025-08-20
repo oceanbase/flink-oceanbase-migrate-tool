@@ -34,6 +34,7 @@ public class DorisContainer extends JdbcDatabaseContainer<DorisContainer> {
     public static final int FE_INNER_PORT = 8030;
     public static final int BE_INNER_PORT = 8040;
     public static final int DB_INNER_PORT = 9030;
+    public static final int BE_RPC_PORT = 9060;
 
     public static final Network NETWORK = Network.newNetwork();
 
@@ -56,13 +57,13 @@ public class DorisContainer extends JdbcDatabaseContainer<DorisContainer> {
 
     public DorisContainer() {
         super(DockerImageName.parse(DOCKER_IMAGE_NAME));
-        setExposedPorts(Arrays.asList(FE_INNER_PORT, BE_INNER_PORT, DB_INNER_PORT));
+        setExposedPorts(Arrays.asList(FE_INNER_PORT, BE_INNER_PORT, DB_INNER_PORT, BE_RPC_PORT));
         setNetwork(NETWORK);
     }
 
     public DorisContainer(Network network) {
         super(DockerImageName.parse(DOCKER_IMAGE_NAME));
-        setExposedPorts(Arrays.asList(FE_INNER_PORT, BE_INNER_PORT, DB_INNER_PORT));
+        setExposedPorts(Arrays.asList(FE_INNER_PORT, BE_INNER_PORT, DB_INNER_PORT, BE_RPC_PORT));
         setNetwork(network);
     }
 
