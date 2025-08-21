@@ -69,16 +69,15 @@ public class Doris2OBTest extends OceanBaseMySQLTestBase {
     public static final GenericContainer<?> FIX_DORIS_CONTAINER =
             new FixedHostPortGenericContainer<>("apache/doris:doris-all-in-one-2.1.0")
                     .withNetwork(NETWORK)
-                    .withFixedExposedPort(7040, FE_HTTP_SERVICE_PORT)
-                    .withFixedExposedPort(7030, FE_QUERY_PORT)
-                    .withFixedExposedPort(7031, SCAN_PORT)
+                    .withFixedExposedPort(FE_HTTP_SERVICE_PORT, FE_HTTP_SERVICE_PORT)
+                    .withFixedExposedPort(FE_QUERY_PORT, FE_QUERY_PORT)
+                    .withFixedExposedPort(SCAN_PORT, SCAN_PORT)
                     .withFixedExposedPort(9060, 9060)
                     .withLogConsumer(new Slf4jLogConsumer(LOG));
 
     @BeforeClass
     public static void startContainers() {
         LOG.info("Starting containers...");
-        FIX_CONTAINER.withFixedExposedPort(2771, 2881).withFixedExposedPort(2772, 2882);
         FIX_CONTAINER.waitingFor(
                 new LogMessageWaitStrategy()
                         .withRegEx(".*boot success!.*")

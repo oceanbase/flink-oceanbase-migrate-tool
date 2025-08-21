@@ -13,14 +13,14 @@
 
 source:
   type: doris
-  jdbc-url : jdbc:mysql://localhost:7030
+  jdbc-url : jdbc:mysql://localhost:9030
   username: root
   password: ""
-  fenodes: localhost:7031
+  fenodes: localhost:8030
   tables: test[1-2].orders[0-9]
 
 oceanbase:
-  url: jdbc:mysql://localhost:2771/test
+  url: jdbc:mysql://localhost:2881/test
   username: root@test
   password: 654321
   schema-name: test
