@@ -1,0 +1,83 @@
+name: Test Module
+
+on:
+  workflow_call:
+    inputs:
+      module:
+        required: true
+        type: string
+      maven_opts:
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  test:
+    name: Test ${{ matrix.datasource }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # 允许其他测试继续运行，即使某个测试失败
+      matrix:
+        datasource: [Doris, StarRocks, ClickHouse]
+        include:
+          - datasource: Doris
+            test_class: com.oceanbase.omt.Doris2OBTest
+            free_disk: true
+            timeout_minutes: 30
+          - datasource: StarRocks
+            test_class: com.oceanbase.omt.StarRocks2OBTest
+            free_disk: false
+            timeout_minutes: 20
+          - datasource: ClickHouse
+            test_class: com.oceanbase.omt.ClickHouse2OBTest
+            free_disk: false
+            timeout_minutes: 20
+    
+    timeout-minutes: ${{ matrix.timeout_minutes }}
+    
+    steps:
+      - name: Free disk space on Ubuntu runner
+        if: matrix.free_disk
+        uses: kfir4444/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'zulu'
+          cache: 'maven'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Maven build
+        run: mvn install -DskipTests=true ${{ inputs.maven_opts }}
+
+      - name: Maven test
+        run: mvn verify -pl :${{ inputs.module }} -Dtest=${{ matrix.test_class }} ${{ inputs.maven_opts }}
+        env:
+          MAVEN_OPTS: -Xmx2g
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-${{ matrix.datasource }}
+          path: |
+            **/target/surefire-reports/
+            **/target/failsafe-reports/
+          retention-days: 7
