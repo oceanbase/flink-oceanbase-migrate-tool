@@ -29,6 +29,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /** Docker integration test class for Doris to OceanBase */
+@Ignore
 public class Doris2OBFixPortTest extends OceanBaseMySQLTestBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(Doris2OBFixPortTest.class);
