@@ -70,9 +70,10 @@ public class ClickHouse2OBTest extends OceanBaseMySQLTestBase {
                     .withLogConsumer(new Slf4jLogConsumer(LOG));
 
     @BeforeClass
-    public static void startContainers() throws SQLException, IOException {
+    public static void startContainers() throws SQLException, IOException, InterruptedException {
         LOG.info("Starting containers...");
         CLICKHOUSE_CONTAINER.start();
+        Thread.sleep(120000);
         verifyClickHouseConnection();
         LOG.info("Containers are started.");
     }
@@ -88,6 +89,8 @@ public class ClickHouse2OBTest extends OceanBaseMySQLTestBase {
                 ResultSet rs = stmt.executeQuery("SELECT version()")) {
             if (rs.next()) {
                 LOG.info("ClickHouse version: {}", rs.getString(1));
+            } else {
+                throw new SQLException("ClickHouse version query failed");
             }
         }
     }
