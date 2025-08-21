@@ -12,7 +12,7 @@ on:
 
 jobs:
   test:
-    name: Test
+    name: Test StarRocks
     runs-on: ubuntu-latest
     steps:
       - name: Free disk space on Ubuntu runner
@@ -39,4 +39,6 @@ jobs:
         run: mvn install -DskipTests=true
 
       - name: Maven test
-        run: mvn verify -pl :${{ inputs.module }} -am ${{ inputs.maven_opts }}
+        run: mvn verify -pl :${{ inputs.module }} -Dtest=com.oceanbase.omt.StarRocks2OBTest
+
+

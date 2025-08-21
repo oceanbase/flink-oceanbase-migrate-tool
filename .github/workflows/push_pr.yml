@@ -16,7 +16,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  flink-omt:
-    uses: ./.github/workflows/test.yml
+  test_starrocks:
+    uses: ./.github/workflows/test_starrocks.yml
+    with:
+      module: flink-omt
+
+  test_doris:
+    uses: ./.github/workflows/test_doris.yml
+    with:
+      module: flink-omt
+
+  test_ck:
+    uses: ./.github/workflows/test_clickhouse.yml
     with:
       module: flink-omt

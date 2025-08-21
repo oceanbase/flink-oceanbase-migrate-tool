@@ -54,9 +54,9 @@ import java.util.stream.Stream;
 
 /** Docker integration test class for Doris to OceanBase */
 @Ignore
-public class Doris2OBFixPortTest extends OceanBaseMySQLTestBase {
+public class Doris2OBTest extends OceanBaseMySQLTestBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Doris2OBFixPortTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Doris2OBTest.class);
 
     private static final String DORIS_JDBC_YAML = "yaml/doris/config-doris.yaml";
     private static final String DORIS_JDBC_ROUTE_YAML = "yaml/doris/config-doris-route.yaml";
