@@ -39,7 +39,7 @@ public enum DataSourceType {
     public static final Function<String, DataSourceType> FROM_VALUE =
             v -> {
                 return Arrays.stream(values())
-                        .filter(t -> t.getValue().equals(v))
+                        .filter(t -> t.getValue().equalsIgnoreCase(v))
                         .findFirst()
                         .orElseThrow(() -> new IllegalArgumentException("Unknown value: " + v));
             };

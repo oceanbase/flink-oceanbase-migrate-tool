@@ -40,6 +40,7 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class CommandLineCliFront {
+    private static final String SKIP_CONFIRM = "skip-confirm";
     private static StreamExecutionEnvironment flinkEnvironmentForTesting;
     private static JobClient jobClient;
 
@@ -50,18 +51,19 @@ public class CommandLineCliFront {
         System.out.println("load config: " + params.get(DatabaseSyncConfig.CONFIG_FILE));
         MigrationConfig migrationConfig =
                 YamlParser.parse(params.get(DatabaseSyncConfig.CONFIG_FILE));
+        boolean skipConfirm = params.has(SKIP_CONFIRM);
         String type = migrationConfig.getSource().getType();
         switch (type.toLowerCase()) {
             case DatabaseSyncConfig.STARROCKS_TYPE:
-                createStarRocksSyncDatabase(migrationConfig);
+                createStarRocksSyncDatabase(migrationConfig, skipConfirm);
                 break;
 
             case DatabaseSyncConfig.CLICKHOUSE_TYPE:
-                createClickHouseSyncDatabase(migrationConfig);
+                createClickHouseSyncDatabase(migrationConfig, skipConfirm);
                 break;
 
             case DatabaseSyncConfig.DORIS_TYPE:
-                createDorisSyncDatabase(migrationConfig);
+                createDorisSyncDatabase(migrationConfig, skipConfirm);
                 break;
 
             default:
@@ -70,55 +72,66 @@ public class CommandLineCliFront {
         }
     }
 
-    private static void createStarRocksSyncDatabase(MigrationConfig migrationConfig)
-            throws Exception {
+    private static void createStarRocksSyncDatabase(
+            MigrationConfig migrationConfig, boolean skipConfirm) throws Exception {
         StarRocksDatabaseSync starRocksDatabaseSync = new StarRocksDatabaseSync(migrationConfig);
         CheckInfoPrinter(migrationConfig, starRocksDatabaseSync);
         starRocksDatabaseSync.createTableInOb();
 
-        System.out.println(
-                "The above table has been created in OceanBase."
-                        + "Please check whether it meets your expectations. \n"
-                        + "If it does, enter Y and press Enter to start data migration."
-                        + "Otherwise, enter N and the tool will exit.(Y/N)\n");
-        Scanner scanner = new Scanner(System.in);
-        String nextLine = scanner.nextLine();
-        if ("Y".equalsIgnoreCase(nextLine)) {
-            System.out.println("Starting data migration.");
+        if (skipConfirm) {
+            System.out.println("Skipping confirmation, starting data migration directly.");
             submitFlinkJob(starRocksDatabaseSync, migrationConfig);
-        } else if ("N".equalsIgnoreCase(nextLine)) {
-            System.out.println("Flink-OMT exited!");
-            System.exit(0);
         } else {
-            System.exit(0);
+            System.out.println(
+                    "The above table has been created in OceanBase."
+                            + "Please check whether it meets your expectations. \n"
+                            + "If it does, enter Y and press Enter to start data migration."
+                            + "Otherwise, enter N and the tool will exit.(Y/N)\n");
+            Scanner scanner = new Scanner(System.in);
+            String nextLine = scanner.nextLine();
+            if ("Y".equalsIgnoreCase(nextLine)) {
+                System.out.println("Starting data migration.");
+                submitFlinkJob(starRocksDatabaseSync, migrationConfig);
+            } else if ("N".equalsIgnoreCase(nextLine)) {
+                System.out.println("Flink-OMT exited!");
+                System.exit(0);
+            } else {
+                System.exit(0);
+            }
         }
     }
 
-    private static void createClickHouseSyncDatabase(MigrationConfig migrationConfig)
-            throws Exception {
+    private static void createClickHouseSyncDatabase(
+            MigrationConfig migrationConfig, boolean skipConfirm) throws Exception {
         ClickHouseDatabaseSync clickHouseDatabaseSync = new ClickHouseDatabaseSync(migrationConfig);
         CheckInfoPrinter(migrationConfig, clickHouseDatabaseSync);
         clickHouseDatabaseSync.createTableInOb();
 
-        System.out.println(
-                "The above table has been created in OceanBase."
-                        + "Please check whether it meets your expectations. \n"
-                        + "If it does, enter Y and press Enter to start data migration."
-                        + "Otherwise, enter N and the tool will exit.(Y/N)\n");
-        Scanner scanner = new Scanner(System.in);
-        String nextLine = scanner.nextLine();
-        if ("Y".equalsIgnoreCase(nextLine)) {
-            System.out.println("Starting data migration.");
+        if (skipConfirm) {
+            System.out.println("Skipping confirmation, starting data migration directly.");
             submitFlinkJob(clickHouseDatabaseSync, migrationConfig);
-        } else if ("N".equalsIgnoreCase(nextLine)) {
-            System.out.println("Flink-OMT exited!");
-            System.exit(0);
         } else {
-            System.exit(0);
+            System.out.println(
+                    "The above table has been created in OceanBase."
+                            + "Please check whether it meets your expectations. \n"
+                            + "If it does, enter Y and press Enter to start data migration."
+                            + "Otherwise, enter N and the tool will exit.(Y/N)\n");
+            Scanner scanner = new Scanner(System.in);
+            String nextLine = scanner.nextLine();
+            if ("Y".equalsIgnoreCase(nextLine)) {
+                System.out.println("Starting data migration.");
+                submitFlinkJob(clickHouseDatabaseSync, migrationConfig);
+            } else if ("N".equalsIgnoreCase(nextLine)) {
+                System.out.println("Flink-OMT exited!");
+                System.exit(0);
+            } else {
+                System.exit(0);
+            }
         }
     }
 
-    private static void createDorisSyncDatabase(MigrationConfig migrationConfig) throws Exception {
+    private static void createDorisSyncDatabase(
+            MigrationConfig migrationConfig, boolean skipConfirm) throws Exception {
         DorisDatabaseSync dorisDatabaseSync = new DorisDatabaseSync(migrationConfig);
         try {
             CheckInfoPrinter(migrationConfig, dorisDatabaseSync);
@@ -127,21 +140,26 @@ public class CommandLineCliFront {
             throw new RuntimeException("Failed to create tables in OceanBase", e);
         }
 
-        System.out.println(
-                "The above table has been created in OceanBase."
-                        + "Please check whether it meets your expectations. \n"
-                        + "If it does, enter Y and press Enter to start data migration."
-                        + "Otherwise, enter N and the tool will exit.(Y/N)\n");
-        Scanner scanner = new Scanner(System.in);
-        String nextLine = scanner.nextLine();
-        if ("Y".equalsIgnoreCase(nextLine)) {
-            System.out.println("Starting data migration.");
+        if (skipConfirm) {
+            System.out.println("Skipping confirmation, starting data migration directly.");
             submitFlinkJob(dorisDatabaseSync, migrationConfig);
-        } else if ("N".equalsIgnoreCase(nextLine)) {
-            System.out.println("Flink-OMT exited!");
-            System.exit(0);
         } else {
-            System.exit(0);
+            System.out.println(
+                    "The above table has been created in OceanBase."
+                            + "Please check whether it meets your expectations. \n"
+                            + "If it does, enter Y and press Enter to start data migration."
+                            + "Otherwise, enter N and the tool will exit.(Y/N)\n");
+            Scanner scanner = new Scanner(System.in);
+            String nextLine = scanner.nextLine();
+            if ("Y".equalsIgnoreCase(nextLine)) {
+                System.out.println("Starting data migration.");
+                submitFlinkJob(dorisDatabaseSync, migrationConfig);
+            } else if ("N".equalsIgnoreCase(nextLine)) {
+                System.out.println("Flink-OMT exited!");
+                System.exit(0);
+            } else {
+                System.exit(0);
+            }
         }
     }
 
