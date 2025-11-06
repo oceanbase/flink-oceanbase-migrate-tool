@@ -56,9 +56,7 @@ PARTITION BY RANGE (k1)
 )
 DISTRIBUTED BY HASH(k2)
 PROPERTIES(
-    "replication_num" = "1",
-    "storage_medium" = "SSD",
-    "storage_cooldown_time" = "2026-12-31 23:59:59"
+    "replication_num" = "1"
 );
 CREATE TABLE IF NOT EXISTS test2.orders4 (
     id BIGINT COMMENT 'Bigint column',
