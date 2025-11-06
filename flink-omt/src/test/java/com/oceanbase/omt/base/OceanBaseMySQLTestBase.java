@@ -137,7 +137,7 @@ public abstract class OceanBaseMySQLTestBase {
         try (Connection connection = conn;
                 Statement statement = connection.createStatement()) {
             for (String tableName : tableNames) {
-                statement.execute("DROP TABLE " + tableName);
+                statement.execute("DROP TABLE IF EXISTS " + tableName);
             }
         }
     }
@@ -146,7 +146,7 @@ public abstract class OceanBaseMySQLTestBase {
         try (Connection connection = conn;
                 Statement statement = connection.createStatement()) {
             for (String tableName : databaseNames) {
-                statement.execute("DROP DATABASE " + tableName);
+                statement.execute("DROP DATABASE IF EXISTS " + tableName);
             }
         }
     }
